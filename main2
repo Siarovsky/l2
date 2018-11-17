@@ -1,0 +1,238 @@
+#include <cstdlib>
+#include <iostream>
+#include <time.h>
+#include <fstream>
+#include <stdio.h>
+using namespace std;
+
+struct node {
+    int key;
+    node *next,*prev;
+}*head=NULL,*tail=NULL;
+
+
+bool findk(int key) {
+    node *tmp;
+    tmp=head;
+    while(tmp)
+    {
+        if(tmp->key==key)
+        {
+            return true;
+        }
+            else if(tmp->next==0)
+            {
+
+            return false;
+            }
+        tmp=tmp->next;
+    }
+}
+
+
+
+
+void add(int key) {
+    node *tmp;
+    if (head==0)
+    {
+        node *nowy=new node;
+        nowy->key=key;
+        nowy->next=0;
+        nowy->prev=0;
+        head=nowy;
+        tail=head;
+
+    }
+    else
+    {
+    tmp=head;
+    while(tmp)
+    {
+
+    if(tmp->key==key)
+    {
+        break;
+    }
+    if(tmp->key < key && tmp->next != 0)
+    {
+        tmp=tmp->next;
+    }
+    else
+    {
+        if(head->key > key)
+        {
+            node *nowy=new node;
+            nowy->key=key;
+            nowy->next=head;
+            nowy->prev=0;
+            nowy->next->prev=nowy;
+            head=nowy;
+            break;
+        }
+        else if(tmp->next==0 && tail->key < key)
+        {
+            node *nowy=new node;
+            nowy->key=key;
+            tmp->next=nowy;
+            nowy->next=0;
+            nowy->prev=tmp;
+            tail=nowy;
+            break;
+        }
+        else
+        {
+            node *nowy=new node;
+
+            nowy->next=tmp->prev->next;
+            nowy->prev=tmp->prev;
+            nowy->key=key;
+            tmp->prev->next=nowy;
+            tmp->prev=nowy;
+
+            break;
+        }
+    }
+    }
+    }
+}
+
+void destroy() {
+    node *tmp;
+    tmp=tail;
+    while(tmp->prev!=0)
+    {
+        delete tmp;
+        tmp=tmp->prev;
+    }
+   delete tmp;
+}
+
+void del(int key) {
+    node *tmp;
+    tmp=head;
+    bool test;
+    test=findk(key);
+    if(test==true)
+    {
+    while(tmp)
+    {
+
+    if(tmp->key==key)
+    {
+        if(tmp->key==head->key)
+        {
+            head=tmp->next;
+            tmp->next->prev=0;
+            delete tmp;
+            break;
+        }
+        else if(tmp->key==tail->key)
+            if(head==tail)
+            {
+                delete tmp;
+                head=0;
+            }
+            else{
+            tmp->prev->next=0;
+            tail=tmp->prev;
+            delete tmp;
+            break;
+            }
+
+        }
+        else
+        {
+            tmp->prev->next=tmp->next;
+            tmp->next->prev=tmp->prev;
+            delete tmp;
+            break;
+        }
+
+    }
+    tmp=tmp->next;
+    }
+    else {cout<<"Klucz nie istnieje!"<<endl; }
+    }
+
+
+void addn(int n)
+{
+    int tmp2=0;
+    for(int i=0;i<n;i++)
+    {
+         tmp2 =( rand() * rand() ) %100000+10;
+         add(tmp2);
+    }
+}
+
+
+void print_head() {
+if(head==0)
+       cout << "Lista jest pusta!";
+   else
+    {
+        node *tmp;
+        tmp=head;
+        while(tmp->next!=NULL)
+        {
+            cout << tmp->key << " -> ";
+            tmp=tmp->next;
+        }
+        cout << tmp->key;
+    }
+    cout << endl;
+}
+
+void print_tail() {
+if(head==0)
+       cout << "Lista jest pusta!";
+   else
+    {
+        node *tmp;
+        tmp=tail;
+        while(tmp->prev!=NULL)
+        {
+            cout << tmp->key << " -> ";
+            tmp=tmp->prev;
+        }
+        cout << tmp->key;
+    }
+    cout << endl;
+}
+int main()
+{
+    int X,k1,k2,k3,k4;
+    srand( time( NULL ) );
+    FILE* fp=fopen("inlab02.txt", "r");
+    if(fp==NULL)
+        return -1;
+    fscanf(fp, "%d %d %d %d %d" , &X, &k1 , &k2, &k3, &k4);
+    fclose(fp);
+    clock_t begin, end;
+    double time_spent;
+    begin = clock();
+    bool spr;
+    del(k1);
+    addn(X);
+    add(k2);
+    del(k2);
+    spr=findk(k3);
+    if(spr==true) cout<<"key sie znajduje"<<endl; else cout<<"Nie znaleziono"<<endl;
+    addn(k4);
+    del(k4);
+    print_head();
+    cout<<endl;
+
+    print_tail();
+
+    destroy();
+
+
+
+
+    end = clock();
+    time_spent = (double)(end-begin) / CLOCKS_PER_SEC;
+    cout<<"CZAS:  "<<time_spent;
+
+}
